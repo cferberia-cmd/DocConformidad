@@ -642,7 +642,7 @@ async function generarDocumento() {
 
     const docxBlob = doc.getZip().generate({ type: 'blob', mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
 
-    mostrarLando('Descargando...');
+    mostrarLoading('Descargando...');
     await new Promise(r => setTimeout(r, 50));
 
     const nombreBase = `Conformidad_${num_inc.replace(/[^a-zA-Z0-9_-]/g,'_')}`;
