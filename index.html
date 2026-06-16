@@ -131,7 +131,7 @@ textarea{resize:vertical;min-height:70px;}
     </div>
     <div class="grid2">
       <div class="field">
-        <label>Promoción <span style="color:red">*</span></label>
+        <label>Promoción</label>
         <input type="text" id="promocion" placeholder="Nombre de la promoción">
       </div>
       <div class="field">
@@ -240,7 +240,7 @@ textarea{resize:vertical;min-height:70px;}
 <!-- FAB BAR -->
 <div class="fab-bar">
   <button class="btn-reset" onclick="resetForm()">↩ Nuevo</button>
-  <button class="btn-main" onclick="generarDocumento()">📄 Generar ZIP</button>
+  <button class="btn-main" onclick="generarDocumento()">📄 Generar DOCX</button>
 </div>
 
 <!-- MODAL FIRMA -->
@@ -571,7 +571,6 @@ function recogerFormulario(validar=true) {
     ['inc_parte1','Parte 1 del nº de incidencia'],
     ['inc_parte2','Parte 2 del nº de incidencia'],
     ['inc_anio','Año de la incidencia'],
-    ['promocion','Promoción'],
     ['rep_nombre','Nombre del representante contratista'],
     ['rep_dni','DNI del representante'],
     ['desc_trabajos','Descripción de los trabajos'],
@@ -643,56 +642,20 @@ async function generarDocumento() {
 
     const docxBlob = doc.getZip().generate({ type: 'blob', mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
 
-    mostrarLoading('Preparando ZIP...');
+    mostrarLando('Descargando...');
     await new Promise(r => setTimeout(r, 50));
 
-    // Build ZIP with docx + (optional) signatures note
-    const jszip = new JSZip();
     const nombreBase = `Conformidad_${num_inc.replace(/[^a-zA-Z0-9_-]/g,'_')}`;
-    jszip.file(`${nombreBase}.docx`, docxBlob);
+    ultimoNombreArchivo = `${nombreBase}.docx`;
+    ultimoZipBlob = docxBlob;
 
-    // Add signatures as PNG if present
-    if (firmaData.avra) {
-      const firmaAvraData = firmaData.avra.replace(/^data:image\/png;base64,/, '');
-      jszip.file('firmas/firma_AVRA.png', firmaAvraData, {base64: true});
-    }
-    if (firmaData.cont) {
-      const firmaContData = firmaData.cont.replace(/^data:image\/png;base64,/, '');
-      jszip.file('firmas/firma_Contratista.png', firmaContData, {base64: true});
-    }
-
-    // Info TXT
-    const infoTxt = [
-      `DOCUMENTO DE CONFORMIDAD FINAL`,
-      `Incidencia: ${num_inc}`,
-      `Promoción: ${data.promocion}`,
-      `Municipio: ${data.municipio || '-'}`,
-      `Provincia: ${data.provincia || '-'}`,
-      `Emplazamiento: ${data.emplazamiento || '-'}`,
-      `Nº Finca: ${data.num_finca || '-'}`,
-      `Representante contratista: ${data.rep_nombre} (DNI: ${data.rep_dni})`,
-      `Fecha finalización: ${fechaFin}`,
-      `Fecha correo AVRA: ${fechaCorreo}`,
-      `Responsable AVRA: ${data.resp_avra}`,
-      `Lugar y fecha firma: ${data.lugar_firma}, ${fd ? fd.display : ''}`,
-      ``,
-      `Generado: ${new Date().toLocaleString('es-ES')}`,
-    ].join('\n');
-    jszip.file('info.txt', infoTxt);
-
-    mostrarLoading('Comprimiendo ZIP...');
-    const zipBlob = await jszip.generateAsync({ type: 'blob', compression: 'DEFLATE' });
-    ultimoZipBlob = zipBlob;
-    ultimoNombreArchivo = `${nombreBase}.zip`;
-
-    // Descargar ZIP
-    const url = URL.createObjectURL(zipBlob);
+    const url = URL.createObjectURL(docxBlob);
     const a = document.createElement('a');
     a.href = url; a.download = ultimoNombreArchivo; a.click();
     setTimeout(() => URL.revokeObjectURL(url), 5000);
 
     ocultarLoading();
-    mostrarAlerta('✓ ZIP generado correctamente', 'ok');
+    mostrarAlerta('✓ Documento generado correctamente', 'ok');
     setTimeout(() => document.getElementById('send-panel').classList.add('active'), 1200);
 
   } catch(e) {
