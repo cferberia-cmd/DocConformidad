@@ -626,48 +626,43 @@ window.addEventListener('beforeunload',saveState);
 async function getGPS(){
   const btn=document.querySelector('.btn-gps'),st=document.getElementById('gps_st');
   btn.textContent='⏳';btn.disabled=true;
-
-  // Diagnóstico visual
-  const info=[];
-  info.push('HTTPS: '+window.isSecureContext);
-  info.push('geo API: '+('geolocation' in navigator));
-  st.textContent=info.join(' | ');
+  st.textContent='Obteniendo posición...';
 
   if(!('geolocation' in navigator)){
-    st.textContent='❌ API de geolocalización no disponible en este navegador';
-    btn.textContent='📡 GPS';btn.disabled=false;return;
-  }
-  if(!window.isSecureContext){
-    st.textContent='❌ Requiere HTTPS. URL actual: '+location.href.substring(0,40);
+    st.textContent='❌ GPS no disponible en este navegador';
     btn.textContent='📡 GPS';btn.disabled=false;return;
   }
 
-  st.textContent='Solicitando permiso GPS...';
   navigator.geolocation.getCurrentPosition(
-    async p=>{
-      const lat=p.coords.latitude.toFixed(6),lon=p.coords.longitude.toFixed(6);
+    async function(p){
+      var lat=p.coords.latitude.toFixed(6);
+      var lon=p.coords.longitude.toFixed(6);
       document.getElementById('gps_disp').value=lat+', '+lon;
-      st.textContent='✓ Posición: '+lat+', '+lon+' — Geocodificando...';
+      st.textContent='Geocodificando...';
       try{
-        const r=await fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat='+lat+'&lon='+lon+'&addressdetails=1&accept-language=es',{headers:{'User-Agent':'ConformidadAVRA/3.0'}});
-        const j=await r.json(),a=j.address||{};
-        const mun=a.city||a.town||a.village||a.municipality||'';
-        const prov=a.province||a.state||'';
-        const road=a.road||a.pedestrian||'';
-        const num=a.house_number||'';
-        const empl=[road,num].filter(Boolean).join(' ');
-        if(mun)document.getElementById('municipio').value=mun;
-        if(prov)document.getElementById('provincia').value=prov;
-        if(empl){document.getElementById('emplazamiento').value=empl;document.getElementById('gps_disp').value=empl;}
+        var r=await fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat='+lat+'&lon='+lon+'&addressdetails=1&accept-language=es');
+        var j=await r.json();
+        var a=j.address||{};
+        var mun=a.city||a.town||a.village||a.municipality||'';
+        var prov=a.province||a.state||'';
+        var road=a.road||a.pedestrian||'';
+        var num=a.house_number||'';
+        var empl=[road,num].filter(Boolean).join(' ');
+        if(mun) document.getElementById('municipio').value=mun;
+        if(prov) document.getElementById('provincia').value=prov;
+        if(empl){
+          document.getElementById('emplazamiento').value=empl;
+          document.getElementById('gps_disp').value=empl;
+        }
         st.textContent='✓ Dirección completada';
-      }catch(fe){
-        st.textContent='⚠ Posición OK pero geocodificación falló: '+fe.message;
+      }catch(e){
+        st.textContent='⚠ Posición OK, geocodificación fallida';
       }
       btn.textContent='📡 GPS';btn.disabled=false;saveState();
     },
-    err=>{
-      const codes={1:'Permiso denegado por el usuario',2:'Posición no disponible',3:'Tiempo de espera agotado'};
-      st.textContent='❌ Error '+err.code+': '+(codes[err.code]||err.message);
+    function(err){
+      var msg={1:'Permiso denegado — actívalo en ajustes del navegador',2:'Posición no disponible',3:'Tiempo de espera agotado'};
+      st.textContent='❌ '+(msg[err.code]||err.message);
       btn.textContent='📡 GPS';btn.disabled=false;
     },
     {enableHighAccuracy:true,timeout:15000,maximumAge:0}
