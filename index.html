@@ -89,17 +89,17 @@ textarea{resize:vertical;min-height:90px;line-height:1.5;}
 .gps-st{font-size:11px;color:var(--sub);margin-top:5px;min-height:15px;}
 
 /* ── INCIDENCIA ── */
-.inc-row{display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;}
-.inc-pre{font-size:15px;font-weight:700;color:var(--azul);flex-shrink:0;}
-.inc-sep{font-size:16px;font-weight:700;color:#aab;flex-shrink:0;}
+.inc-row{display:flex;align-items:center;justify-content:center;gap:4px;flex-wrap:nowrap;overflow:hidden;}
+.inc-pre{font-size:13px;font-weight:700;color:var(--azul);flex-shrink:0;}
+.inc-sep{font-size:13px;font-weight:700;color:#aab;flex-shrink:0;}
 .inc-p{
   border:1.5px solid var(--gris-borde);border-radius:7px;
-  padding:10px 8px;font-size:14px;font-family:monospace;
+  padding:8px 4px;font-size:13px;font-family:monospace;
   text-align:center;text-transform:uppercase;
   transition:border-color .15s,box-shadow .15s;
 }
 .inc-p:focus{outline:none;border-color:var(--azul2);box-shadow:0 0 0 3px rgba(36,113,163,.15);}
-#ip1{width:80px;min-width:60px;}#ip2{width:74px;min-width:55px;}#ipy{width:68px;min-width:58px;}
+#ip1{width:72px;}#ip2{width:64px;}#ipy{width:62px;}
 
 /* ── FIRMAS ── */
 .firmas-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
@@ -626,7 +626,10 @@ window.addEventListener('beforeunload',saveState);
 async function getGPS(){
   const btn=document.querySelector('.btn-gps'),st=document.getElementById('gps_st');
   btn.textContent='⏳';btn.disabled=true;st.textContent='Obteniendo posición...';
-  if(!navigator.geolocation){st.textContent='GPS no disponible';btn.textContent='📡 GPS';btn.disabled=false;return;}
+  if(!navigator.geolocation||!window.isSecureContext){
+    st.textContent=window.isSecureContext?'GPS no disponible en este dispositivo':'GPS requiere HTTPS — abre desde GitHub Pages o servidor';
+    btn.textContent='📡 GPS';btn.disabled=false;return;
+  }
   navigator.geolocation.getCurrentPosition(async p=>{
     const lat=p.coords.latitude.toFixed(6),lon=p.coords.longitude.toFixed(6);
     document.getElementById('gps_disp').value=`${lat}, ${lon}`;
