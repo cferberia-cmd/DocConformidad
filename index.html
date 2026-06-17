@@ -758,14 +758,19 @@ jszip/dist/jszip.min.js:
     };
     if(!validate)return d;
     document.querySelectorAll('.err').forEach(function(el){el.classList.remove('err');});
-    var req=[['ip1','Parte 1 incidencia'],['ip2','Parte 2 incidencia'],['ipy','Año incidencia'],
-      ['rep_nombre','Nombre representante'],['rep_dni','DNI'],
-      ['desc_trabajos','Descripción trabajos'],['fecha_fin','Fecha finalización'],
-      ['fecha_correo','Fecha correo AVRA'],['resp_avra','Responsable AVRA'],
-      ['lugar_firma','Lugar firma'],['fecha_firma','Fecha firma'],['nom-avra','Nombre firmante AVRA'],['nom-cont','Nombre firmante Contratista']];
+    var req=[
+      ['ip1','Parte 1 incidencia','ip1'],['ip2','Parte 2 incidencia','ip2'],['ipy','Año incidencia','ipy'],
+      ['rep_nombre','Nombre representante','rep_nombre'],['rep_dni','DNI','rep_dni'],
+      ['desc_trabajos','Descripción trabajos','desc_trabajos'],
+      ['fecha_fin','Fecha finalización','fecha_fin'],['fecha_correo','Fecha correo AVRA','fecha_correo'],
+      ['resp_avra','Responsable AVRA','resp_avra'],
+      ['lugar_firma','Lugar firma','lugar_firma'],['fecha_firma','Fecha firma','fecha_firma'],
+      ['nom_avra','Nombre firmante AVRA','nom-avra'],['nom_cont','Nombre firmante Contratista','nom-cont']
+    ];
     var errs=[];
     req.forEach(function(r){
-      if(!d[r[0]]){var el=document.getElementById(r[0]);if(el)el.classList.add('err');errs.push(r[1]);}
+      var domId=r[2]||r[0];
+      if(!d[r[0]]){var el=document.getElementById(domId);if(el)el.classList.add('err');errs.push(r[1]);}
     });
     if(errs.length){showToast('Faltan: '+errs.slice(0,3).join(', ')+(errs.length>3?'...':''));return null;}
     return d;
