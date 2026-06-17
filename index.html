@@ -89,7 +89,7 @@ textarea{resize:vertical;min-height:90px;line-height:1.5;}
 .gps-st{font-size:11px;color:var(--sub);margin-top:5px;min-height:15px;}
 
 /* ── INCIDENCIA ── */
-.inc-row{display:flex;align-items:center;gap:6px;flex-wrap:nowrap;}
+.inc-row{display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;}
 .inc-pre{font-size:15px;font-weight:700;color:var(--azul);flex-shrink:0;}
 .inc-sep{font-size:16px;font-weight:700;color:#aab;flex-shrink:0;}
 .inc-p{
@@ -99,7 +99,7 @@ textarea{resize:vertical;min-height:90px;line-height:1.5;}
   transition:border-color .15s,box-shadow .15s;
 }
 .inc-p:focus{outline:none;border-color:var(--azul2);box-shadow:0 0 0 3px rgba(36,113,163,.15);}
-#ip1{width:80px;}#ip2{width:74px;}#ipy{width:68px;}
+#ip1{width:80px;min-width:60px;}#ip2{width:74px;min-width:55px;}#ipy{width:68px;min-width:58px;}
 
 /* ── FIRMAS ── */
 .firmas-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
@@ -239,7 +239,7 @@ textarea{resize:vertical;min-height:90px;line-height:1.5;}
             <span class="inc-sep">-</span>
             <input class="inc-p" id="ip2" maxlength="10" placeholder="000">
             <span class="inc-sep">-</span>
-            <input class="inc-p" id="ipy" maxlength="4" placeholder="2026" type="number" min="2020" max="2099">
+            <input class="inc-p" id="ipy" maxlength="4" placeholder="2026" inputmode="numeric" pattern="[0-9]{4}">
           </div>
         </div>
       </div>
